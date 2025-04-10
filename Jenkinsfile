@@ -3,9 +3,10 @@ pipeline {
 
     environment {
         SPRING_PROFILES_ACTIVE = 'dev'
+    }
 
-          stage('Checkout Code') {
-
+    stages {
+        stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/Barhoum1919/foyer_devops.git'
             }
@@ -32,10 +33,11 @@ pipeline {
 
     post {
         success {
-            echo 'Build succeeded!'
+            echo ' Build succeeded!'
         }
         failure {
-            echo 'Build failed.'
+            echo ' Build failed.'
         }
     }
 }
+
