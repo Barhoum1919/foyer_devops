@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'jdk17'       
-        maven 'Maven 3.9' 
-    }
-
     environment {
         SPRING_PROFILES_ACTIVE = 'dev'
     }
