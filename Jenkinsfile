@@ -3,12 +3,11 @@ pipeline {
 
     environment {
         SPRING_PROFILES_ACTIVE = 'dev'
-    }
 
-    stages {
-        stage('Checkout Code') {
+          stage('Checkout Code') {
+
             steps {
-                git 'https://github.com/Barhoum1919/foyer_devops.git'
+                git branch: 'main', url: 'https://github.com/Barhoum1919/foyer_devops.git'
             }
         }
 
