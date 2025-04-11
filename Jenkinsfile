@@ -29,6 +29,13 @@ pipeline {
                 sh 'mvn package'
             }
         }
+stage('MVN SONARQUBE') {
+    steps {
+        withSonarQubeEnv('MySonarQubeServer') {
+            sh 'mvn clean verify sonar:sonar '
+        }
+    }
+}
     }
 
     post {
