@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         SPRING_PROFILES_ACTIVE = 'dev'
+        SONAR_HOST_URL = 'http://localhost:9000'       
+        SONAR_TOKEN = credentials('sonar-token')  
     }
 
     stages {
@@ -29,13 +31,17 @@ pipeline {
                 sh 'mvn package'
             }
         }
-stage('MVN SONARQUBE') {
-    steps {
-        withSonarQubeEnv('MySonarQubeServer') {
-            sh 'mvn clean verify sonar:sonar '
+   stage('SonarQube Analysis') {
+            steps {
+                sh """
+                    mvn clean verify sonar:sonar \
+                    -Dsonar.projectKey=foyer-devops \
+                    -Dsonar.projectName='Foyer DevOps' \
+                    -Dsonar.host.url=$SONAR_HOST_URL \
+                    -Dsonar.login=$SONAR_TOKEN
+                """
+            }
         }
-    }
-}
     }
 
     post {
