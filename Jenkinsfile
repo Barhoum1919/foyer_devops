@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-               SPRING_PROFILES_ACTIVE = 'dev'
-               SONAR_HOST_URL = 'http://localhost:9000'
-               SONAR_TOKEN = credentials('sonar-token')
-               DOCKERHUB_USERNAME = 'ibrahimdarghouthi1919'
-               DOCKERHUB_PASSWORD = credentials('dockerhub-password')
-               IMAGE_NAME = 'foyer-devops'
-               VERSION = 'latest'
+        SPRING_PROFILES_ACTIVE = 'dev'
+        SONAR_HOST_URL = 'http://localhost:9000'
+        SONAR_TOKEN = credentials('sonar-token')
+        DOCKERHUB_USERNAME = 'ibrahimdarghouthi1919'
+        DOCKERHUB_PASSWORD = credentials('dockerhub-password')
+        IMAGE_NAME = 'foyer-devops'
+        VERSION = 'latest'
     }
 
     stages {
@@ -35,7 +35,8 @@ pipeline {
                 sh 'mvn package'
             }
         }
-   stage('SonarQube Analysis') {
+
+        stage('SonarQube Analysis') {
             steps {
                 sh """
                     mvn clean verify sonar:sonar \
@@ -50,10 +51,8 @@ pipeline {
         stage('Build Docker Image with Docker Compose') {
             steps {
                 script {
-
-                    sh """
-                        docker-compose -f docker-compose.yml build app
-                    """
+                    // Build the Docker image for the 'app' service defined in docker-compose.yml
+                    sh 'docker-compose build app'
                 }
             }
         }
@@ -61,7 +60,7 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 script {
-
+                    // Login to Docker Hub using credentials
                     sh """
                         echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
                     """
@@ -72,10 +71,8 @@ pipeline {
         stage('Tag Docker Image') {
             steps {
                 script {
-
-                    sh """
-                        docker tag foyer-devops_app:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:$VERSION
-                    """
+                    // Tag the built Docker image with the proper Docker Hub name and version
+                    sh 'docker tag foyer-devops_app:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:$VERSION'
                 }
             }
         }
@@ -83,30 +80,25 @@ pipeline {
         stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
-
-                    sh """
-                        docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$VERSION
-                    """
+                    // Push the tagged Docker image to Docker Hub
+                    sh 'docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$VERSION'
                 }
             }
         }
 
- stage('Deploy to Nexus') {
-    steps {
-        sh 'mvn deploy'
+        stage('Deploy to Nexus') {
+            steps {
+                sh 'mvn deploy'
+            }
+        }
     }
-   }
-
-    }
-
 
     post {
         success {
-            echo ' Build succeeded!'
+            echo 'Build, Docker push, and deployment succeeded!'
         }
         failure {
-            echo ' Build failed.'
+            echo 'Build, Docker push, or deployment failed.'
         }
     }
 }
-
