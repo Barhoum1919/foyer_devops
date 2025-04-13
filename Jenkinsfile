@@ -2,9 +2,13 @@ pipeline {
     agent any
 
     environment {
-        SPRING_PROFILES_ACTIVE = 'dev'
-        SONAR_HOST_URL = 'http://localhost:9000'       
-        SONAR_TOKEN = credentials('sonar-token')  
+               SPRING_PROFILES_ACTIVE = 'dev'
+               SONAR_HOST_URL = 'http://localhost:9000'
+               SONAR_TOKEN = credentials('sonar-token')
+               DOCKERHUB_USERNAME = 'ibrahimdarghouthi1919'
+               DOCKERHUB_PASSWORD = credentials('dockerhub-password')
+               IMAGE_NAME = 'foyer-devops'
+               VERSION = 'latest'
     }
 
     stages {
@@ -42,6 +46,51 @@ pipeline {
                 """
             }
         }
+
+        stage('Build Docker Image with Docker Compose') {
+            steps {
+                script {
+
+                    sh """
+                        docker-compose -f docker-compose.yml build app
+                    """
+                }
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+
+                    sh """
+                        echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+                    """
+                }
+            }
+        }
+
+        stage('Tag Docker Image') {
+            steps {
+                script {
+
+                    sh """
+                        docker tag foyer-devops_app:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:$VERSION
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                script {
+
+                    sh """
+                        docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$VERSION
+                    """
+                }
+            }
+        }
+
  stage('Deploy to Nexus') {
     steps {
         sh 'mvn deploy'
