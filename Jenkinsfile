@@ -72,7 +72,7 @@ pipeline {
             steps {
                 script {
                     // Tag the built Docker image with the proper Docker Hub name and version
-                    sh 'docker tag foyer-devops_app:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:$VERSION'
+                    sh 'docker tag foyer-devops:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:$VERSION'
                 }
             }
         }
