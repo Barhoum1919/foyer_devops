@@ -91,6 +91,17 @@ pipeline {
                 sh 'mvn deploy'
             }
         }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Make sure minikube is the context
+                    sh "kubectl config use-context minikube"
+                    // Apply the deployment and service yaml
+                    sh "kubectl apply -f k8s/"
+                }
+            }
+        }
+
     }
 
     post {
