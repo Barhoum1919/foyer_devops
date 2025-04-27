@@ -93,7 +93,7 @@ pipeline {
         }
   stage('Deploy to Kubernetes (Minikube)') {
       steps {
-          sshagent(['ssh-wsl-credentials']) {
+          sshagent(credentials: ['ssh-wsl-credentials']) {
               sh '''
                   ssh -o StrictHostKeyChecking=no ibrah@172.25.100.50 '
                       cd /mnt/c/Users/ibrah/Downloads/foyer/foyer &&
