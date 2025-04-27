@@ -91,16 +91,20 @@ pipeline {
                 sh 'mvn deploy'
             }
         }
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    // Make sure minikube is the context
-                    sh "kubectl config use-context minikube"
-                    // Apply the deployment and service yaml
-                    sh "kubectl apply -f k8s/"
-                }
-            }
-        }
+  stage('Deploy to Kubernetes (Minikube)') {
+      steps {
+          sshagent(['ssh-wsl-credentials']) {
+              sh '''
+                  ssh -o StrictHostKeyChecking=no ibrah@172.25.100.50 '
+                      cd /mnt/c/Users/ibrah/Downloads/foyer/foyer &&
+                      kubectl apply -f k8s/deployment.yaml &&
+                      kubectl apply -f k8s/service.yaml
+                  '
+              '''
+          }
+      }
+  }
+
 
     }
 
